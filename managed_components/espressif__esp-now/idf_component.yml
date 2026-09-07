@@ -1,0 +1,12 @@
+dependencies:
+  cmake_utilities: '>=0.5.3'
+  idf: '>=4.4'
+description: This package provides enhanced ESP-NOW functions which will be easy to
+  integrate into product.
+issues: https://github.com/espressif/esp-now/issues
+repository: git://github.com/espressif/esp-now.git
+repository_info:
+  commit_sha: 4432294ef6a6cb274b441c0678414455a4055cff
+  path: .
+url: https://github.com/espressif/esp-now
+version: 2.5.3

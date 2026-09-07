@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+C:/Users/cosmo/LiteWing/build/CMakeFiles/bootloader
+C:/Users/cosmo/LiteWing/build/CMakeFiles/bootloader.rule
+C:/Users/cosmo/LiteWing/build/CMakeFiles/bootloader-complete.rule
+C:/Users/cosmo/LiteWing/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+C:/Users/cosmo/LiteWing/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+C:/Users/cosmo/LiteWing/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+C:/Users/cosmo/LiteWing/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+C:/Users/cosmo/LiteWing/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+C:/Users/cosmo/LiteWing/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+C:/Users/cosmo/LiteWing/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule

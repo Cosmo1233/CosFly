@@ -1,0 +1,13 @@
+dependencies:
+  esp-now:
+    version: 2.*
+  espressif/cjson:
+    rules:
+    - if: idf_version >=6.0
+    version: ^1.0.0
+  espressif/mdns:
+    rules:
+    - if: idf_version >=5.0
+    version: ^1.0.7
+  idf:
+    version: '>=4.4'

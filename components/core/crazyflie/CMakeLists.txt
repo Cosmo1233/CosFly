@@ -80,4 +80,5 @@ target_compile_options(${COMPONENT_LIB} PRIVATE "-fno-strict-aliasing"
                                                 "-Wno-absolute-value"
                                                 "-Wno-address-of-packed-member"
                                                 "-Wno-stringop-truncation"
-                                                "-Wno-format")
+                                                "-Wno-format"
+                                                "-Wno-error=stringop-overflow")

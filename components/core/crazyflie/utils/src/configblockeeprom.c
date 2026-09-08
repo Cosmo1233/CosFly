@@ -123,8 +123,10 @@ int configblockInit(void)
   if(isInit)
     return 0;
 
-  i2cdevInit(I2C1_DEV);
-  eepromInit(I2C1_DEV);
+  // CosFly V1: config-block EEPROM shares the single internal I2C bus
+  // (baro/mag/expander) rather than a separate deck bus -- see I2C0_DEV.
+  i2cdevInit(I2C0_DEV);
+  eepromInit(I2C0_DEV);
 
   // Because of strange behavior from I2C device during expansion port test
   // the first read needs to be discarded

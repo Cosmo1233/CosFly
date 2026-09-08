@@ -24,16 +24,17 @@ CONFIG_SPI_PIN_MOSI=38
 CONFIG_SPI_PIN_CLK=39
 CONFIG_SPI_PIN_CS0=40
 
-# I2C0 = "sensors bus" (i2cdev I2C0_DEV). BMP280 baro + BMM150 mag.
+# I2C0 = "sensors bus" (i2cdev I2C0_DEV), CosFly's single internal I2C bus
+# (schematic: INT_SDA/INT_SCL). BMP280 baro, BMM150 mag, config-block EEPROM,
+# and the PCA GPIO expander are all wired to it, so configblockeeprom.c and
+# pca9555.c/pca95x4.c were repointed from I2C1_DEV to I2C0_DEV to match.
 CONFIG_I2C0_PIN_SDA=33
 CONFIG_I2C0_PIN_SCL=34
 
-# I2C1 = "deck bus" (i2cdev I2C1_DEV): config-block EEPROM + PCA GPIO expander.
-# Its old defaults (40/41) now collide with SPI CS0 and MOTOR02, and it is
-# initialised at boot by configblockInit(), so it cannot simply be left alone.
-# Parked on two unused GPIOs until the EEPROM/expander bus is mapped from the
-# schematic. The EEPROM probe fails harmlessly and configblock falls back to
-# its built-in defaults.
+# I2C1 = "deck bus" (i2cdev I2C1_DEV). Nothing on CosFly V1 uses it -- the
+# EEPROM/expander were moved to I2C0 above. Only the (unused, no deck present)
+# VL53L0/VL53L1 ToF flow-deck drivers still reference I2C1_DEV, so these pins
+# are just harmless placeholders, not a real bus.
 CONFIG_I2C1_PIN_SDA=14
 CONFIG_I2C1_PIN_SCL=15
 

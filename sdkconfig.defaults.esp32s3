@@ -1,3 +1,58 @@
 CONFIG_FREERTOS_UNICORE=n
 CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240=y
 CONFIG_ESP32S3_DEFAULT_CPU_FREQ_MHZ=240
+
+# ---------------------------------------------------------------------------
+# CosFly V1 board pin map
+#
+# LiteWing/ESP-Drone defaults target a different board. Everything below is
+# the CosFly V1 schematic. Format is "was -> is" so the delta stays readable.
+# ---------------------------------------------------------------------------
+
+# Motors (brushed). Numeric order here is NOT verified against physical arms
+# yet -- see step 2 of the port (spin each motor with props off).
+# M1 LeftUp, M2 RightUp, M3 RightDown, M4 LeftDown per schematic labels.
+CONFIG_MOTOR01_PIN=2
+CONFIG_MOTOR02_PIN=41
+CONFIG_MOTOR03_PIN=7
+CONFIG_MOTOR04_PIN=8
+
+# SPI -- BMI270 IMU lives here on CosFly (LiteWing had the IMU on I2C0 and
+# used this bus for a PMW3901 flow deck).
+CONFIG_SPI_PIN_MISO=37
+CONFIG_SPI_PIN_MOSI=38
+CONFIG_SPI_PIN_CLK=39
+CONFIG_SPI_PIN_CS0=40
+
+# I2C0 = "sensors bus" (i2cdev I2C0_DEV). BMP280 baro + BMM150 mag.
+CONFIG_I2C0_PIN_SDA=33
+CONFIG_I2C0_PIN_SCL=34
+
+# I2C1 = "deck bus" (i2cdev I2C1_DEV): config-block EEPROM + PCA GPIO expander.
+# Its old defaults (40/41) now collide with SPI CS0 and MOTOR02, and it is
+# initialised at boot by configblockInit(), so it cannot simply be left alone.
+# Parked on two unused GPIOs until the EEPROM/expander bus is mapped from the
+# schematic. The EEPROM probe fails harmlessly and configblock falls back to
+# its built-in defaults.
+CONFIG_I2C1_PIN_SDA=14
+CONFIG_I2C1_PIN_SCL=15
+
+# Battery sense. LiteWing's default (GPIO2) is a CosFly motor pin.
+CONFIG_ADC1_PIN=3
+
+# BMI270 has two INT pins (accel + gyro); neither is wired up yet and the
+# driver will start out polling. Left at the LiteWing default -- unused, and
+# not a collision.
+CONFIG_MPU_PIN_INT=12
+
+# LEDs on CosFly sit behind the PCA I2C expander, not on direct GPIOs.
+# GREEN/RED defaults (7/8) are CosFly motor pins, and ledInit() runs at boot,
+# so they are parked on free GPIOs (the pins I2C0 just vacated) to keep
+# ledInit() from driving the motors. Revisit when the expander is wired up.
+CONFIG_LED_PIN_BLUE=9
+CONFIG_LED_PIN_GREEN=10
+CONFIG_LED_PIN_RED=11
+
+# No buzzer on CosFly, and the buzzer pins (39/38) are now SPI CLK/MOSI.
+# buzzerInit() is #ifdef'd on this, so =n keeps it off those pins.
+CONFIG_BUZZER_ON=n

@@ -230,7 +230,16 @@ menu "ESPDrone Config"
             range 0 43 if TARGET_ESP32_S2_DRONE_V1_2
             default 12 if TARGET_ESP32_S2_DRONE_V1_2
             help
-                GPIO number (IOxx) MPU_PIN_INT
+                GPIO number (IOxx) MPU_PIN_INT. On CosFly this is the BMI270 INT1 pin.
+
+        config IMU_PIN_INT2
+            int "IMU_PIN_INT2 GPIO number"
+            range 0 48
+            default 35
+            help
+                GPIO number (IOxx) of the BMI270 INT2 pin. The BMI270 has no fixed
+                accel/gyro pin: any interrupt source can be mapped to INT1 or INT2
+                via INT_MAP_DATA / INT1_MAP_FEAT / INT2_MAP_FEAT.
 
         config ADC1_PIN
             int "ADC1_PIN GPIO number"

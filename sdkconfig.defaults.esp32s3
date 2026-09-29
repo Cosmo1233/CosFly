@@ -41,10 +41,13 @@ CONFIG_I2C1_PIN_SCL=15
 # Battery sense. LiteWing's default (GPIO2) is a CosFly motor pin.
 CONFIG_ADC1_PIN=3
 
-# BMI270 has two INT pins (accel + gyro); neither is wired up yet and the
-# driver will start out polling. Left at the LiteWing default -- unused, and
-# not a collision.
-CONFIG_MPU_PIN_INT=12
+# BMI270 INT1/INT2. These are NOT split accel/gyro -- every interrupt source
+# (data ready, FIFO, error, features) can be mapped to either pin in software
+# (INT_MAP_DATA 0x58, INT1/2_MAP_FEAT 0x56/0x57). Plan: data-ready on INT1 to
+# pace the stabilizer loop; INT2 spare for error/feature interrupts.
+# MPU_PIN_INT is the existing LiteWing name, reused here for INT1.
+CONFIG_MPU_PIN_INT=36
+CONFIG_IMU_PIN_INT2=35
 
 # LEDs on CosFly sit behind the PCA I2C expander, not on direct GPIOs.
 # GREEN/RED defaults (7/8) are CosFly motor pins, and ledInit() runs at boot,

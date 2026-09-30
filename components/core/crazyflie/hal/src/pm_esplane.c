@@ -117,7 +117,9 @@ void pmInit(void)
     return;
   }
 
-    pmEnableExtBatteryVoltMeasuring(CONFIG_ADC1_PIN, 2); // ADC1 PIN is fixed to ADC channel
+    // CosFly V1: VBAT -> 200k (R15) -> ADC_BAT -> 100k (R18) -> GND, so VBAT = 3 x Vadc.
+    // (LiteWing used a 1:1 divider, multiplier 2.)
+    pmEnableExtBatteryVoltMeasuring(CONFIG_ADC1_PIN, 3);
 
     pmSyslinkInfo.pgood = false;
     pmSyslinkInfo.chg = false;

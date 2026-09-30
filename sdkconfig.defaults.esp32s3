@@ -12,8 +12,10 @@ CONFIG_ESP32S3_DEFAULT_CPU_FREQ_MHZ=240
 # Motors (brushed). Numeric order here is NOT verified against physical arms
 # yet -- see step 2 of the port (spin each motor with props off).
 # M1 LeftUp, M2 RightUp, M3 RightDown, M4 LeftDown per schematic labels.
+# M2 is chip pin 48 (MTMS) = GPIO42 per the schematic netlist. GPIO41 (pin 47)
+# is E_TX2 on the breakout header.
 CONFIG_MOTOR01_PIN=2
-CONFIG_MOTOR02_PIN=41
+CONFIG_MOTOR02_PIN=42
 CONFIG_MOTOR03_PIN=7
 CONFIG_MOTOR04_PIN=8
 
@@ -38,13 +40,15 @@ CONFIG_I2C0_PIN_SCL=34
 CONFIG_I2C1_PIN_SDA=14
 CONFIG_I2C1_PIN_SCL=15
 
-# Battery sense. LiteWing's default (GPIO2) is a CosFly motor pin.
-CONFIG_ADC1_PIN=3
+# Battery sense: chip pin 9 = GPIO4 (ADC1_CH3), behind a 200k/100k divider
+# (R15/R18) so VBAT = 3 x Vadc. GPIO3 is only a strapping pin with a pull-up.
+CONFIG_ADC1_PIN=4
 
 # BMI270 INT1/INT2. These are NOT split accel/gyro -- every interrupt source
 # (data ready, FIFO, error, features) can be mapped to either pin in software
-# (INT_MAP_DATA 0x58, INT1/2_MAP_FEAT 0x56/0x57). Plan: data-ready on INT1 to
-# pace the stabilizer loop; INT2 spare for error/feature interrupts.
+# (INT_MAP_DATA 0x58, INT1/2_MAP_FEAT 0x56/0x57). Both have 4.7k pull-ups
+# (R27/R29), so they are configured active-low open-drain. Data-ready is
+# mapped to INT1; INT2 is spare for error/feature interrupts.
 # MPU_PIN_INT is the existing LiteWing name, reused here for INT1.
 CONFIG_MPU_PIN_INT=36
 CONFIG_IMU_PIN_INT2=35

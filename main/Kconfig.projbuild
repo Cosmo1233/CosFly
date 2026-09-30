@@ -1,4 +1,4 @@
-menu "ESPDrone Config"
+menu "CosFly Config"
 
     choice
         prompt "ESP_Drone hardware version"
@@ -53,7 +53,7 @@ menu "ESPDrone Config"
     menu "wireless config"
         config WIFI_BASE_SSID
             string "Wi-Fi Base SSID"
-            default "LiteWing"
+            default "CosFly"
             help
                 Wi-Fi Base SSID, 1-16 characters. the final SSID will be BASE_SSID-MAC
         config WIFI_PASSWORD

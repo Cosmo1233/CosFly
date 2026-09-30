@@ -7,7 +7,7 @@
   "clangd.arguments": [
     "--background-index",
     "--query-driver=**",
-    "--compile-commands-dir=c:\\Users\\cosmo\\LiteWing\\build"
+    "--compile-commands-dir=${workspaceFolder}/build"
   ],
   "idf.openOcdConfigs": [
     "board/esp32s3-builtin.cfg"

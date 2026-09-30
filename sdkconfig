@@ -517,7 +517,7 @@ CONFIG_PARTITION_TABLE_MD5=y
 # end of Partition Table
 
 #
-# ESPDrone Config
+# CosFly Config
 #
 # CONFIG_TARGET_ESPLANE_V1 is not set
 # CONFIG_TARGET_ESPLANE_V2_S2 is not set
@@ -536,7 +536,7 @@ CONFIG_ENABLE_COMMAND_MODE_SET=y
 #
 # wireless config
 #
-CONFIG_WIFI_BASE_SSID="LiteWing"
+CONFIG_WIFI_BASE_SSID="CosFly"
 CONFIG_WIFI_PASSWORD="12345678"
 CONFIG_WIFI_CHANNEL=6
 CONFIG_WIFI_MAX_STA_CONN=3
@@ -600,7 +600,7 @@ CONFIG_MOTOR02_PIN=42
 CONFIG_MOTOR03_PIN=7
 CONFIG_MOTOR04_PIN=8
 # end of motors config
-# end of ESPDrone Config
+# end of CosFly Config
 
 #
 # Compiler options

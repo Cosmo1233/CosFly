@@ -2,6 +2,9 @@ CONFIG_FREERTOS_UNICORE=n
 CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240=y
 CONFIG_ESP32S3_DEFAULT_CPU_FREQ_MHZ=240
 
+# Wi-Fi network the drone creates: "CosFly_<MAC>"
+CONFIG_WIFI_BASE_SSID="CosFly"
+
 # ---------------------------------------------------------------------------
 # CosFly V1 board pin map
 #

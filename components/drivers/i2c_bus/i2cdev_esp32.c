@@ -47,6 +47,13 @@ bool i2cdevRead(I2C_Dev *dev, uint8_t devAddress, uint16_t len, uint8_t *data)
     return i2cdevReadReg8(dev, devAddress, I2CDEV_NO_MEM_ADDR, len, data);
 }
 
+// Declared in i2cdev.h but never implemented upstream; needed by drivers that
+// put the register byte in the data buffer themselves (e.g. PCA9534).
+bool i2cdevWrite(I2C_Dev *dev, uint8_t devAddress, uint16_t len, uint8_t *data)
+{
+    return i2cdevWriteReg8(dev, devAddress, I2CDEV_NO_MEM_ADDR, len, data);
+}
+
 bool i2cdevReadByte(I2C_Dev *dev, uint8_t devAddress, uint8_t memAddress,
                     uint8_t *data)
 {

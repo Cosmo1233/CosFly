@@ -273,13 +273,14 @@ menu "ESPDrone Config"
                 I2C bus (I2C0) instead of ESP32 GPIOs. When enabled, the
                 LED_PIN_* GPIOs below are not touched.
 
-        config LED_PCA9534_ADDR
-            hex "PCA9534 7-bit I2C address"
+        config LED_PCA9534_ADDR_PINS
+            int "PCA9534A address strap pins (A2..A0)"
             depends on LED_VIA_PCA9534
-            default 0x38
+            range 0 7
+            default 0
             help
-                0x38 = PCA9534A with A2..A0 tied to GND (CosFly V1).
-                A plain PCA9534 with the same straps is 0x20.
+                Value of the A2/A1/A0 strap pins, 0 = all tied to GND (CosFly V1).
+                The driver adds this to the PCA9534A base address 0x38.
 
         config LED_PIN_BLUE
             int "LED_PIN_BLUE GPIO number"

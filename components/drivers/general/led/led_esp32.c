@@ -29,7 +29,8 @@
 #include "stm32_legacy.h"
 
 #ifdef CONFIG_LED_VIA_PCA9534
-#include "pca9534.h"
+#include "freertos/semphr.h"
+#include "pca9534_port.h"
 
 /*
  * CosFly V1: the LEDs are on PCA9534A (U3) port pins, not ESP32 GPIOs.
@@ -57,6 +58,15 @@ static int led_polarity[] = {
     [LED_RED]   = LED_POL_NEG,
     [LED_GREEN] = LED_POL_NEG,
 };
+
+static PCA9534_Handler_t expander;
+static bool expanderReady = false;
+// Local copy of the Output register. The library's PCA9534_WriteOne() reads
+// the register back before every write (3 I2C transfers) and is not safe if
+// two tasks change LEDs at once, so ledSet() updates this copy under a mutex
+// and writes the whole byte in one transfer instead.
+static uint8_t expanderOutputs;
+static SemaphoreHandle_t expanderLock;
 #else
 static unsigned int led_pin[] = {
     [LED_BLUE] = LED_GPIO_BLUE,
@@ -83,12 +93,19 @@ void ledInit()
 
 #ifdef CONFIG_LED_VIA_PCA9534
     (void)i;
-    if (pca9534Init(I2C0_DEV, CONFIG_LED_PCA9534_ADDR)) {
-        // All levels high except blue, i.e. every LED off. Pins that stay
-        // inputs ignore the Output register, so their bits don't matter.
+    expanderLock = xSemaphoreCreateMutex();
+    pca9534PortLink(&expander, I2C0_DEV);
+
+    // PCA9534_Init() also resets the chip: all pins inputs, outputs latched high.
+    if (PCA9534_Init(&expander, PCA9534_DEVICE_PCA9534A, CONFIG_LED_PCA9534_ADDR_PINS) == PCA9534_OK) {
+        // All levels high except blue, i.e. every LED off. Write the levels
+        // before switching the pins to outputs so nothing flashes on.
+        // Pins that stay inputs ignore the Output register.
         uint8_t outputs = (1 << EXP_PIN_GREEN_L) | (1 << EXP_PIN_RED_L) | (1 << EXP_PIN_BLUE_L);
-        uint8_t levels = 0xFF & ~(1 << EXP_PIN_BLUE_L);
-        pca9534ConfigOutputs(outputs, levels);
+        expanderOutputs = 0xFF & ~(1 << EXP_PIN_BLUE_L);
+        PCA9534_Write(&expander, expanderOutputs);
+        PCA9534_SetDir(&expander, outputs);     // 1 = output
+        expanderReady = true;
     }
     isInit = true;
     return;
@@ -160,7 +177,17 @@ void ledSet(led_t led, bool value)
 #ifdef CONFIG_LED_VIA_PCA9534
     // One I2C write. ledSet() is only called from task context (ledseq
     // timers, system task), never from an interrupt, so blocking is fine.
-    pca9534WritePin(led_pin[led], value);
+    if (!expanderReady) {
+        return;
+    }
+    xSemaphoreTake(expanderLock, portMAX_DELAY);
+    uint8_t next = value ? (expanderOutputs | (1 << led_pin[led]))
+                         : (expanderOutputs & ~(1 << led_pin[led]));
+    if (next != expanderOutputs) {
+        expanderOutputs = next;
+        PCA9534_Write(&expander, expanderOutputs);
+    }
+    xSemaphoreGive(expanderLock);
     return;
 #endif
 

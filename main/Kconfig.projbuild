@@ -265,6 +265,22 @@ menu "ESPDrone Config"
     endmenu
 
     menu "led config"
+        config LED_VIA_PCA9534
+            bool "LEDs are driven through a PCA9534A I2C GPIO expander"
+            default n
+            help
+                CosFly V1: the status LEDs hang off a PCA9534A on the internal
+                I2C bus (I2C0) instead of ESP32 GPIOs. When enabled, the
+                LED_PIN_* GPIOs below are not touched.
+
+        config LED_PCA9534_ADDR
+            hex "PCA9534 7-bit I2C address"
+            depends on LED_VIA_PCA9534
+            default 0x38
+            help
+                0x38 = PCA9534A with A2..A0 tied to GND (CosFly V1).
+                A plain PCA9534 with the same straps is 0x20.
+
         config LED_PIN_BLUE
             int "LED_PIN_BLUE GPIO number"
             range 0 34 if TARGET_ESPLANE_V1

@@ -31,17 +31,12 @@
 /*to support different hardware platform */
 static platformConfig_t configs[] = {
 
+    // LiteWing's "EP20"/"ED12" entries used the MPU6050 sensor set, whose
+    // drivers are no longer in this tree.
     {
-        .deviceType = "EP20",
-        .deviceTypeName = "ESPlane 2.0 ",
-        .sensorImplementation = SensorImplementation_mpu6050_HMC5883L_MS5611,
-        .physicalLayoutAntennasAreClose = false,
-        .motorMap = motorMapDefaultBrushed,
-    },
-    {
-        .deviceType = "ED12",
-        .deviceTypeName = "ESP_Drone_v1_2",
-        .sensorImplementation = SensorImplementation_mpu6050_HMC5883L_MS5611,
+        .deviceType = "CF01",
+        .deviceTypeName = "CosFly V1",
+        .sensorImplementation = SensorImplementation_bmi270_bmp280_bmm150,
         .physicalLayoutAntennasAreClose = false,
         .motorMap = motorMapDefaultBrushed,
     },
@@ -64,5 +59,5 @@ bool platformInitHardware()
 
 const char *platformConfigGetPlatformName()
 {
-    return "ED12";
+    return "CF01";
 }

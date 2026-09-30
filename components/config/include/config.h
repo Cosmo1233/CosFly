@@ -105,6 +105,7 @@
 #define FLOW_TASK_PRI           5
 #define ZRANGER2_TASK_PRI       5
 #define ZRANGER_TASK_PRI        5
+#define BARO_MAG_TASK_PRI       3
 #define SENSORS_TASK_PRI        6
 #define STABILIZER_TASK_PRI     7
 #define KALMAN_TASK_PRI         4
@@ -129,6 +130,7 @@
 #define PARAM_TASK_NAME         "PARAM"
 #define PM_TASK_NAME            "PWRMGNT"
 #define PROXIMITY_TASK_NAME     "PROXIMITY"
+#define BARO_MAG_TASK_NAME      "BAROMAG"
 #define SENSORS_TASK_NAME       "SENSORS"
 #define STABILIZER_TASK_NAME    "STABILIZER"
 #define SYSLINK_TASK_NAME       "SYSLINK"
@@ -154,6 +156,7 @@
 #define MEM_TASK_STACKSIZE            (2 * configBASE_STACK_SIZE)
 #define PARAM_TASK_STACKSIZE          (2 * configBASE_STACK_SIZE)
 #define PM_TASK_STACKSIZE             (4 * configBASE_STACK_SIZE)
+#define BARO_MAG_TASK_STACKSIZE       (3 * configBASE_STACK_SIZE)
 #define SENSORS_TASK_STACKSIZE        (5 * configBASE_STACK_SIZE)
 #define STABILIZER_TASK_STACKSIZE     (5 * configBASE_STACK_SIZE)
 #define SYSLINK_TASK_STACKSIZE        (1 * configBASE_STACK_SIZE)

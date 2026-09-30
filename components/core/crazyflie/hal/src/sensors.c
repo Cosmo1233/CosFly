@@ -56,6 +56,10 @@
 #include "sensors_mpu6050_hm5883L_ms5611.h"
 #endif
 
+#ifdef SENSOR_INCLUDED_BMI270_BMP280_BMM150
+#include "sensors_bmi270_bmp280_bmm150.h"
+#endif
+
 typedef struct {
   SensorImplementation_t implements;
   void (*init)(void);
@@ -110,6 +114,23 @@ static const sensorsImplementation_t sensorImplementations[SensorImplementation_
     .readBaro = sensorsBmi088SpiBmp388ReadBaro,
     .setAccMode = sensorsBmi088SpiBmp388SetAccMode,
     .dataAvailableCallback = sensorsBmi088SpiBmp388DataAvailableCallback,
+  },
+#endif
+#ifdef SENSOR_INCLUDED_BMI270_BMP280_BMM150
+  {
+    .implements = SensorImplementation_bmi270_bmp280_bmm150,
+    .init = sensorsBmi270Bmp280Bmm150Init,
+    .test = sensorsBmi270Bmp280Bmm150Test,
+    .areCalibrated = sensorsBmi270Bmp280Bmm150AreCalibrated,
+    .manufacturingTest = sensorsBmi270Bmp280Bmm150ManufacturingTest,
+    .acquire = sensorsBmi270Bmp280Bmm150Acquire,
+    .waitDataReady = sensorsBmi270Bmp280Bmm150WaitDataReady,
+    .readGyro = sensorsBmi270Bmp280Bmm150ReadGyro,
+    .readAcc = sensorsBmi270Bmp280Bmm150ReadAcc,
+    .readMag = sensorsBmi270Bmp280Bmm150ReadMag,
+    .readBaro = sensorsBmi270Bmp280Bmm150ReadBaro,
+    .setAccMode = sensorsBmi270Bmp280Bmm150SetAccMode,
+    .dataAvailableCallback = nullFunction,
   },
 #endif
 #ifdef SENSOR_INCLUDED_MPU6050_HMC5883L_MS5611

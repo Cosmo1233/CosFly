@@ -28,7 +28,9 @@
 
 #define PLATFORM_DEVICE_TYPE_STRING_MAX_LEN (32 + 1)
 #define PLATFORM_DEVICE_TYPE_MAX_LEN (4 + 1)
-#define SENSOR_INCLUDED_MPU6050_HMC5883L_MS5611
+// CosFly V1: BMI270 + BMP280 + BMM150. (LiteWing's MPU6050/HMC5883L/MS5611
+// drivers have been removed, so SENSOR_INCLUDED_MPU6050_HMC5883L_MS5611 is off.)
+#define SENSOR_INCLUDED_BMI270_BMP280_BMM150
 
 typedef enum {
 #ifdef SENSOR_INCLUDED_BMI088_BMP388
@@ -49,6 +51,10 @@ typedef enum {
 
 #ifdef SENSOR_INCLUDED_BOSCH
     SensorImplementation_bosch,
+#endif
+
+#ifdef SENSOR_INCLUDED_BMI270_BMP280_BMM150
+    SensorImplementation_bmi270_bmp280_bmm150,
 #endif
 
     SensorImplementation_COUNT,

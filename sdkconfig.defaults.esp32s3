@@ -51,10 +51,13 @@ CONFIG_ADC1_PIN=4
 # (data ready, FIFO, error, features) can be mapped to either pin in software
 # (INT_MAP_DATA 0x58, INT1/2_MAP_FEAT 0x56/0x57). Both have 4.7k pull-ups
 # (R27/R29), so they are configured active-low open-drain. Data-ready is
-# mapped to INT1; INT2 is spare for error/feature interrupts.
+# mapped to INT1; INT2 carries no-motion (low while the drone is still).
 # MPU_PIN_INT is the existing LiteWing name, reused here for INT1.
 CONFIG_MPU_PIN_INT=36
 CONFIG_IMU_PIN_INT2=35
+# Set =n on a board that needs GPIO35 for something else: no-motion is then
+# polled over SPI instead and the pin is never touched.
+CONFIG_IMU_INT2_NO_MOTION=y
 
 # LEDs on CosFly sit behind the PCA9534A I2C expander (U3, A2..A0 = GND ->
 # 0x38, i.e. ADDR_PINS=0), not on direct GPIOs. With LED_VIA_PCA9534 set, led_esp32.c drives

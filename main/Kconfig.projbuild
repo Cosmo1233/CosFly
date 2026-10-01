@@ -241,6 +241,17 @@ menu "CosFly Config"
                 accel/gyro pin: any interrupt source can be mapped to INT1 or INT2
                 via INT_MAP_DATA / INT1_MAP_FEAT / INT2_MAP_FEAT.
 
+        config IMU_INT2_NO_MOTION
+            bool "Signal BMI270 no-motion (drone at rest) on INT2"
+            default y
+            help
+                When enabled, the BMI270's no-motion detector drives INT2 low
+                while the drone is still, and the ESP32 reads IMU_PIN_INT2.
+                When disabled, IMU_PIN_INT2 is left untouched (free for other
+                uses on a future board) and the firmware instead polls the
+                BMI270's INT_STATUS_0 register over SPI. Either way the result
+                is logged as imu_motion.still.
+
         config ADC1_PIN
             int "ADC1_PIN GPIO number"
             range 32 39 if TARGET_ESPLANE_V1

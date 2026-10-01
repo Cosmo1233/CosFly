@@ -87,6 +87,20 @@
 #define BARO_MAG_PERIOD_MS       20                     // 50 Hz task, baro and mag alternate -> 25 Hz each
 
 #define GPIO_IMU_INT1            CONFIG_MPU_PIN_INT
+#define GPIO_IMU_INT2            CONFIG_IMU_PIN_INT2
+
+/*
+ * No-motion detection, computed inside the BMI270 (datasheet 4.8.3) from the
+ * accelerometer at 50 Hz. "Still" means the slope between samples stays below
+ * the threshold on all three axes for the whole duration.
+ *   duration:  in 20 ms steps   -> 50 = 1 s
+ *   threshold: 1 g / 2048 steps -> 30 = ~15 mg (Bosch default is 0x90 = 70 mg)
+ * Raise the threshold if the drone never reads still on the bench, lower it
+ * if small knocks don't clear it.
+ */
+#define NO_MOTION_DURATION       50
+#define NO_MOTION_THRESHOLD      30
+#define NO_MOTION_CHECK_TICKS    40     // update imu_motion.still every 40 ms
 
 /* ---------------------------------------------------------------------------
  * Board orientation
@@ -165,6 +179,9 @@ static bool isMagnetometerPresent = false;
 
 // Counts BMI270 INT1 data-ready pulses. Should climb at ~1600/s.
 static volatile uint32_t imuDrdyCount = 0;
+
+// 1 while the BMI270 reports no-motion (drone at rest), else 0.
+static uint8_t isStill = 0;
 
 static Axis3i16 gyroRaw;
 static Axis3i16 accelRaw;
@@ -251,10 +268,30 @@ static void IRAM_ATTR imuInt1IsrHandler(void *arg)
     imuDrdyCount++;
 }
 
+// Called from sensorsTask only, so SPI reads here never collide with the IMU
+// data reads (the SPI device is not shared between tasks).
+static void updateNoMotion(void)
+{
+#ifdef CONFIG_IMU_INT2_NO_MOTION
+    // INT2 is open-drain active-low and follows the no-motion condition
+    // (non-latched), so the pin level is the answer.
+    isStill = (gpio_get_level(GPIO_IMU_INT2) == 0);
+#else
+    // No pin: read INT_STATUS_0 instead. Reading clears the bit, and the
+    // BMI270 sets it again at its next 50 Hz evaluation while still holding,
+    // so polling slower than 50 Hz still sees it.
+    uint16_t status;
+    if (bmi2_get_int_status(&status, &bmi270) == BMI2_OK) {
+        isStill = (status & BMI270_NO_MOT_STATUS_MASK) ? 1 : 0;
+    }
+#endif
+}
+
 static void sensorsTask(void *param)
 {
     // Accel X/Y/Z then gyro X/Y/Z, 16-bit little-endian, registers 0x0C..0x17
     uint8_t buffer[12];
+    uint32_t tick = 0;
 
     systemWaitStart();
 
@@ -271,6 +308,11 @@ static void sensorsTask(void *param)
 
             // Unlock the stabilizer task
             xSemaphoreGive(dataReady);
+
+            // Slow housekeeping after the stabilizer has its data
+            if (isBmi270Present && (++tick % NO_MOTION_CHECK_TICKS) == 0) {
+                updateNoMotion();
+            }
         }
     }
 }
@@ -417,15 +459,30 @@ static bool bmi270DeviceInit(void)
     // which a 1 kHz loop cannot afford.
     bmi2_set_adv_power_save(BMI2_DISABLE, &bmi270);
 
-    uint8_t sensList[2] = { BMI2_ACCEL, BMI2_GYRO };
-    rslt = bmi2_sensor_enable(sensList, 2, &bmi270);
+    uint8_t sensList[3] = { BMI2_ACCEL, BMI2_GYRO, BMI2_NO_MOTION };
+    rslt = bmi2_sensor_enable(sensList, 3, &bmi270);
     if (rslt != BMI2_OK) {
         DEBUG_PRINTE("BMI270 sensor enable [FAIL] (%d)\n", rslt);
         return false;
     }
 
+    // No-motion feature: all three axes, see NO_MOTION_* above. Non-fatal if
+    // it fails: flight only needs accel + gyro.
+    struct bmi2_sens_config noMotion;
+    noMotion.type = BMI2_NO_MOTION;
+    bmi2_get_sensor_config(&noMotion, 1, &bmi270);
+    noMotion.cfg.no_motion.duration = NO_MOTION_DURATION;
+    noMotion.cfg.no_motion.threshold = NO_MOTION_THRESHOLD;
+    noMotion.cfg.no_motion.select_x = BMI2_ENABLE;
+    noMotion.cfg.no_motion.select_y = BMI2_ENABLE;
+    noMotion.cfg.no_motion.select_z = BMI2_ENABLE;
+    if (bmi2_set_sensor_config(&noMotion, 1, &bmi270) != BMI2_OK) {
+        DEBUG_PRINTW("BMI270 no-motion config [FAIL]\n");
+    }
+
     // INT1: data-ready, active-low open-drain (4.7k pull-up R27).
-    // INT2: output disabled for now; its pull-up (R29) holds it high.
+    // INT2: no-motion, active-low open-drain (4.7k pull-up R29), or output
+    //       disabled when CONFIG_IMU_INT2_NO_MOTION is off.
     struct bmi2_int_pin_config pinCfg;
     bmi2_get_int_pin_config(&pinCfg, &bmi270);
     pinCfg.pin_type = BMI2_INT_BOTH;
@@ -436,10 +493,17 @@ static bool bmi270DeviceInit(void)
     pinCfg.pin_cfg[0].input_en = BMI2_INT_INPUT_DISABLE;
     pinCfg.pin_cfg[1].lvl = BMI2_INT_ACTIVE_LOW;
     pinCfg.pin_cfg[1].od = BMI2_INT_OPEN_DRAIN;
+#ifdef CONFIG_IMU_INT2_NO_MOTION
+    pinCfg.pin_cfg[1].output_en = BMI2_INT_OUTPUT_ENABLE;
+#else
     pinCfg.pin_cfg[1].output_en = BMI2_INT_OUTPUT_DISABLE;
+#endif
     pinCfg.pin_cfg[1].input_en = BMI2_INT_INPUT_DISABLE;
     bmi2_set_int_pin_config(&pinCfg, &bmi270);
     bmi2_map_data_int(BMI2_DRDY_INT, BMI2_INT1, &bmi270);
+#ifdef CONFIG_IMU_INT2_NO_MOTION
+    bmi2_map_feat_int(BMI2_NO_MOTION, BMI2_INT2, &bmi270);
+#endif
 
     return true;
 }
@@ -524,6 +588,18 @@ static void sensorsInterruptInit(void)
     // which is fine: the service is shared.
     gpio_install_isr_service(0);
     gpio_isr_handler_add(GPIO_IMU_INT1, imuInt1IsrHandler, NULL);
+
+#ifdef CONFIG_IMU_INT2_NO_MOTION
+    // INT2 is only read as a level (no interrupt needed for a slow signal).
+    gpio_config_t int2Conf = {
+        .intr_type = GPIO_INTR_DISABLE,
+        .pin_bit_mask = (1ULL << GPIO_IMU_INT2),
+        .mode = GPIO_MODE_INPUT,
+        .pull_down_en = 0,
+        .pull_up_en = 0,                          // external 4.7k pull-up R29
+    };
+    gpio_config(&int2Conf);
+#endif
 }
 
 static void sensorsTaskInit(void)
@@ -768,6 +844,10 @@ PARAM_ADD(PARAM_UINT8 | PARAM_RONLY, BMI270, &isBmi270Present)
 PARAM_ADD(PARAM_UINT8 | PARAM_RONLY, BMP280, &isBarometerPresent)
 PARAM_ADD(PARAM_UINT8 | PARAM_RONLY, BMM150, &isMagnetometerPresent)
 PARAM_GROUP_STOP(imu_sensors)
+
+LOG_GROUP_START(imu_motion)
+LOG_ADD(LOG_UINT8, still, &isStill)
+LOG_GROUP_STOP(imu_motion)
 
 LOG_GROUP_START(imu_drdy)
 LOG_ADD(LOG_UINT32, count, &imuDrdyCount)

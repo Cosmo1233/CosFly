@@ -28,9 +28,12 @@
 #define PID_H_
 
 #include <stdbool.h>
+#include "sdkconfig.h"
 #include "filter.h"
 
-#ifdef CONFIG_TARGET_ESP32_S2_DRONE_V1_2
+// ESP-Drone's gains for its S2 board, unless CosFly asks for the Crazyflie
+// defaults below (menuconfig: PID_CRAZYFLIE_DEFAULTS).
+#if defined(CONFIG_TARGET_ESP32_S2_DRONE_V1_2) && !defined(CONFIG_PID_CRAZYFLIE_DEFAULTS)
   #define PID_ROLL_RATE_KP  190.0
   #define PID_ROLL_RATE_KI  440.0
   #define PID_ROLL_RATE_KD  2.6

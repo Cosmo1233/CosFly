@@ -329,6 +329,18 @@ menu "CosFly Config"
     endmenu
 
     menu "motors config"
+        config PID_CRAZYFLIE_DEFAULTS
+            bool "Use Crazyflie default PID gains"
+            default y
+            help
+                pid.h holds two gain sets. Enabled: the Crazyflie 2.x defaults
+                (rate 250/500/2.5, attitude 5.9/2.9), a good start for a
+                Crazyflie-sized frame. Disabled: ESP-Drone's set tuned for the
+                ESP32-S2-Drone (rate 190/440/2.6, attitude 5.3/2.5), which the
+                selected target would otherwise pick. Gains can still be changed
+                live from cfclient (pid_rate.*, pid_attitude.*); those changes
+                are lost on reboot.
+
         choice
             prompt "Motor type"
             default MOTOR_BRUSHED_715 if TARGET_ESPLANE_V1 || TARGET_ESPLANE_V2_S2

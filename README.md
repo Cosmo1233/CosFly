@@ -11,7 +11,6 @@ Flight firmware for **CosFly V1**, a small brushed-motor quadcopter built around
 | MCU | ESP32-S3FN8 | – |
 | IMU | Bosch BMI270 | SPI |
 | Barometer | Bosch BMP280 | I2C (0x76) |
-| Magnetometer | Bosch BMM150 | I2C (0x10) |
 | Status LEDs | TI PCA9534A GPIO expander | I2C (0x38) |
 | Config EEPROM | Microchip 24AA64 | I2C (0x50) |
 | Charger | TI BQ24075 | – |

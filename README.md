@@ -39,6 +39,7 @@ components/drivers/      chip drivers (vendor code + ESP-IDF port files)
 components/platform/     board definition (CosFly = "CF01")
 components/config/       task priorities and stack sizes
 Python-Scripts/          PC-side scripts using cflib
+tools/board_test/        standalone hardware bring-up test (sensors, motors, power, RF)
 ```
 
 ## Talking to it

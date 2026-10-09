@@ -1,0 +1,14 @@
+CONFIG_IDF_TARGET="esp32s3"
+
+# ESP32-S3FN8: 8 MB of flash
+CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
+
+# Print to (and read keys from) the USB-C port. The flight firmware's primary
+# console is UART0, whose pins are not wired to anything you can plug into.
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+
+# 1 ms ticks, so the IMU can be read every 2 ms while its interrupts are counted
+CONFIG_FREERTOS_HZ=1000
+
+# Keep ESP-IDF's own logs (Wi-Fi especially) out of the test report
+CONFIG_LOG_DEFAULT_LEVEL_WARN=y

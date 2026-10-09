@@ -9,3 +9,6 @@ sdkconfig.old
 
 # Stray build directory (idf.py -B bchk)
 bchk/
+
+# Board test: generated from tools/board_test/sdkconfig.defaults
+tools/board_test/sdkconfig

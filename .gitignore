@@ -12,3 +12,11 @@ bchk/
 
 # Board test: generated from tools/board_test/sdkconfig.defaults
 tools/board_test/sdkconfig
+
+# Altium: local backups, regenerated previews and ECO logs (Git is the history)
+hardware/**/History/
+hardware/**/__Previews/
+hardware/**/Project Logs for */
+*.SchDocPreview
+*.$$$Preview
+*.LOG

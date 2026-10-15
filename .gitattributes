@@ -1,0 +1,13 @@
+# Store hardware files byte-for-byte: no line-ending conversion on Windows,
+# so Altium documents and fab outputs (gerbers, drill, pick-and-place) stay exact.
+hardware/** -text
+
+# Altium and CAD files are binary: never convert, never text-diff
+*.PcbDoc binary
+*.SchDoc binary
+*.PcbLib binary
+*.SchLib binary
+*.step   binary
+*.zip    binary
+*.pdf    binary
+*.xlsx   binary
